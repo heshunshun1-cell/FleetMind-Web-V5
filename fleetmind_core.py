@@ -58,6 +58,14 @@ class Truck:
             return 'risk-warning'
         else:
             return 'risk-high'
+        
+    def get_profit_class(self):
+        # 根据利润是正数还是负数，返回对应的 CSS class 名称
+        # 这方法不负责计算利润，只负责告诉网页应该用什么颜色显示利润
+        if self.calculate_profit() >= 0:
+            return 'profit-positive'
+        else:
+            return 'profit-negative'
 
      
     def get_highest_cost_category(self):

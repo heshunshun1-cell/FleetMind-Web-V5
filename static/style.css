@@ -204,3 +204,15 @@ pre {
     background-color: #fdecea;
     color: #b42318;
 }
+
+/* 利润为正： 绿色 */
+.profit-positive {
+    color: #1f7a3f;
+    font-weight: bold;
+}
+
+/* 利润为负：红色 */
+.profit-negative {
+    color: #b42318;
+    font-weight: bold;
+}
