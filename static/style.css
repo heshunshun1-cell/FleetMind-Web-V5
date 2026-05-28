@@ -216,3 +216,25 @@ pre {
     color: #b42318;
     font-weight: bold;
 }
+
+/* FleetMind 建议卡片 */
+.suggestion-box {
+    background-color: #f0f6ff;
+    border-left: 5px solid #1f3c88;
+    padding: 16px;
+    border-radius: 10px;
+    margin-top: 12px;
+}
+
+/* 建议卡片标题 */
+.suggestion-title {
+    font-weight: bold;
+    color: #1f3c88;
+    margin-bottom: 8px;
+}
+
+/* 建议正文 */
+.suggestion-text {
+    line-height: 1.7;
+    margin: 0;
+}

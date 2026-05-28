@@ -75,8 +75,13 @@
                 (${{ "{:,.2f}".format(truck.get_highest_cost_category()[1]) }})
             </p>
 
-            <p><strong>Suggestion:</strong></p>
-            <p>{{ truck.generate_suggestion() }}</p>
+            <div class="suggestion-box">
+                <div class="suggestion-title">FleetMind Suggestion</div>
+                <p class="suggestion-text">
+                    🚚 {{ truck.generate_suggestion() }}
+                </p>
+            </div>
+
         </div>
 
         <!-- 页面导航按钮 -->
