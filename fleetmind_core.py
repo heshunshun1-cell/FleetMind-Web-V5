@@ -1,3 +1,11 @@
+import csv
+import os
+# 负责写入csv，os负责检查文件是否存在
+# 是我们以后保存新增车辆数据的文件名
+CSV_FILE = "fleet_data.csv"
+
+
+
 class Truck:
     def __init__(self, truck_id, driver, route, revenue, fuel_cost, 
                  toll_cost, repair_cost, salary_cost, insurance_cost, other_cost):
@@ -292,6 +300,84 @@ def save_analysis_history(truck):
     
     except:
         return False
+    
+
+def save_truck_to_csv(truck):
+    # 把新增truck的结构化数据保存到fleet_data.csv
+    # 这个函数不会影响原来的file_history.txt功能
+    try:
+        file_exists = os.path.exists(CSV_FILE)
+
+        with open(CSV_FILE, "a", newline="", encoding="utf-8") as file:
+            writer = csv.writer(file)
+
+            # 如果csv文件不存在，就先写入表头
+            if not file_exists:
+                writer.writerow([
+                    'truck_id',
+                    'driver',
+                    'route',
+                    'revenue',
+                    'fuel_cost',
+                    'toll_cost',
+                    'repair_cost',
+                    'salary_cost',
+                    'insurance_cost',
+                    'other_cost',
+                    'total_cost',
+                    'profit',
+                    'profit_margin',
+                    'risk_level',
+                    'highest_cost_category',
+                    'highest_cost_value'
+                ])
+
+            highest_category, highest_value = truck.get_highest_cost_category()
+
+            # 写入当前truck的一行数据
+            writer.writerow([
+                truck.truck_id,
+                truck.driver,
+                truck.route,
+                truck.revenue,
+                truck.fuel_cost,
+                truck.toll_cost,
+                truck.repair_cost,
+                truck.salary_cost,
+                truck.insurance_cost,
+                truck.other_cost,
+                truck.calculate_total_cost(),
+                truck.calculate_profit(),
+                truck.calculate_profit_margin(),
+                truck.get_risk_level(),
+                highest_category,
+                highest_value
+            ])
+
+        return True
+    
+    except Exception as e:
+        print("CSV save error:", e)
+        return False
+
+
+def read_trucks_from_csv():
+    # 读取fleet_data.csv里的结构化车辆数据
+    # 返回一个list，每一条记录是一个dictionary
+    records = [] 
+
+    try:
+        with open(CSV_FILE, "r", encoding="utf-8") as file:
+            reader = csv.DictReader(file)
+
+            for row in reader:
+                records.append(row)
+
+        return records
+    
+    except FileNotFoundError:
+        return []
+
     
 def read_analysis_history():
     # 读取之前保存的分析记录，并把内容返回给网页。

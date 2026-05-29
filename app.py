@@ -10,6 +10,8 @@ from fleetmind_core import (
     Truck,
     create_sample_trucks,
     save_analysis_history,
+    save_truck_to_csv,
+    read_trucks_from_csv,
     read_analysis_history,
     compare_trucks,
     get_ai_response
@@ -106,11 +108,17 @@ def new_truck():
         # 保存新车分析记录到 fleet_history.txt
         saved = save_analysis_history(truck)
 
+        # 保存新车结构化数据到 fleet_data.csv
+        csv_saved = save_truck_to_csv(truck)
+        # 为了debug用的
+        print("CSV saved:", csv_saved)
+
         # 跳转到 result.html，显示这辆新车的分析结果
         return render_template(
             "result.html",
             truck=truck,
-            saved=saved
+            saved=saved,
+            csv_saved=csv_saved
         )
 
     # 如果用户只是打开 /new-truck 页面，就显示输入表单
@@ -172,10 +180,25 @@ def history():
     # 把历史记录传给 history.html 显示
     return render_template("history.html", history_text=history_text)
 
+# csv 车辆记录页面
+@app.route("/records")
+def records():
+    # 从fleet_data.csv读取新增车辆记录
+    records = read_trucks_from_csv()
+
+    # 吧records传给records.html显示
+    return render_template("records.html", records=records)
+
+# 用户访问 /records
+# Flask 调用 read_trucks_from_csv()
+# 读取 fleet_data.csv
+# 把 records 传给 records.html
+
 
 # 程序入口
 # 只有直接运行 app.py 时，Flask 才会启动
 if __name__ == "__main__":
     # debug=True 表示开发模式
     # 修改代码后通常会自动重启，也方便查看错误信息
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
+    

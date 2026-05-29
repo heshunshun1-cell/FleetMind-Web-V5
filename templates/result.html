@@ -16,6 +16,15 @@
             <p class="warning-message">Analysis history was not saved.</p>
         {% endif %}
 
+        <!-- 如果新车结构化数据成功保存到 fleet_data.csv，就显示提示 -->
+        {% if csv_saved is defined %}
+            {% if csv_saved %}
+                <p class="success-message">CSV record saved successfully.</p>
+            {% else %}
+                <p class="warning-message">CSV record was not saved.</p>
+            {% endif %}
+        {% endif %}
+
         <!-- 车辆基本信息 -->
         <div class="card">
             <h2>Basic Information</h2>
