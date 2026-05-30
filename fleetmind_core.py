@@ -482,6 +482,225 @@ def get_dashboard_data():
     }
 
 
+# =========================
+# V4 Analytics: Charts
+# =========================
+
+# 收入图表
+def generate_revenue_chart():
+    import csv
+    import os
+    import matplotlib
+    # 不要打开图形窗口，只在后台生成图片文件
+    matplotlib.use("Agg")
+    
+    import matplotlib.pyplot as plt
+
+    truck_ids = []
+    revenues = []
+
+    # 读取CSV里的车辆收入数据
+    with open("fleet_data.csv", "r", newline="", encoding="utf-8") as file:
+        reader = csv.DictReader(file)
+
+        for row in reader:
+            truck_ids.append(row["truck_id"])
+            revenues.append(float(row["revenue"]))
+
+        #  确保charts文件夹存在
+        os.makedirs("static/charts", exist_ok=True)
+
+        # 生成revenue柱状图
+        plt.figure(figsize=(8, 5))
+        plt.bar(truck_ids, revenues)
+
+        plt.title("Revenue by Truck")
+        plt.xlabel("Truck ID")
+        plt.ylabel("Revenue")
+
+        # 旋转Truck ID, 避免文字重叠
+        plt.xticks(rotation=30)
+        plt.tight_layout()
+
+        # 保存图表图片
+        plt.savefig("static/charts/revenue_chart.png")
+        plt.close()
+
+# 利润图表
+def generate_profit_chart():
+    import csv
+    import os
+    import matplotlib
+
+    matplotlib.use("Agg")
+
+    import matplotlib.pyplot as plt
+
+    truck_ids = []
+    profits = []
+
+    # 读取csv里的车辆利润数据
+    with open("fleet_data.csv", "r", newline="", encoding="utf-8") as file:
+        reader = csv.DictReader(file)
+
+        for row in reader:
+            truck_ids.append(row["truck_id"])
+            profits.append(float(row["profit"]))
+
+        # 确保charts文件存在
+        os.makedirs("static/charts", exist_ok=True)
+
+        # 生成利润柱状图表
+        plt.figure(figsize=(8, 5))
+        bars = plt.bar(truck_ids, profits)
+
+        plt.title("Profit by Truck")
+        plt.xlabel("Truck ID")
+        plt.xlabel("Profit")
+
+        # 在柱状图上显示利润数值和亏损的
+        for bar, profit in zip(bars, profits):
+            x_position = bar.get_x() + bar.get_width() / 2
+
+            if profit >= 0:
+                y_position = profit
+                verticle_align = "bottom"
+            else:
+                y_position = profit
+                verticle_align = "top"
+
+            plt.text(
+                x_position,
+                y_position,
+                f"{profit:.0f}",
+                ha="center",
+                va=verticle_align
+            )
+
+        # 旋转truck ID 避免文字重叠
+        plt.xticks(rotation=30)
+        plt.tight_layout()
+
+        # 保存图表图片
+        plt.savefig("static/charts/profit_chart.png")
+        plt.close()
+
+
+# Risk Distribution Chart
+def generate_risk_chart():
+    import csv
+    import os
+    import matplotlib
+
+    matplotlib.use("Agg")
+
+    import matplotlib.pyplot as plt
+
+    # 固定显示四种风险等级
+    risk_counts = {
+        "Excellent": 0,
+        "Normal": 0,
+        "Warning": 0,
+        "High Risk": 0
+    }
+
+    # 读取 CSV 里的风险等级数据
+    with open("fleet_data.csv", "r", newline="", encoding="utf-8") as file:
+        reader = csv.DictReader(file)
+
+        for row in reader:
+            risk_level = row["risk_level"]
+
+            if risk_level in risk_counts:
+                risk_counts[risk_level] += 1
+
+    # 确保 charts 文件夹存在
+    os.makedirs("static/charts", exist_ok=True)
+
+    # 生成风险等级分布图
+    plt.figure(figsize=(8, 5))
+    bars = plt.bar(risk_counts.keys(), risk_counts.values())
+
+    plt.title("Risk Level Distribution")
+    plt.xlabel("Risk Level")
+    plt.ylabel("Number of Trucks")
+
+    # 在柱状图上显示车辆数量
+    for bar in bars:
+        height = bar.get_height()
+        x_position = bar.get_x() + bar.get_width() / 2
+
+        plt.text(
+            x_position,
+            height,
+            f"{int(height)}",
+            ha="center",
+            va="bottom"
+        )
+
+    plt.xticks(rotation=30)
+    plt.tight_layout()
+
+    # 保存图表图片
+    plt.savefig("static/charts/risk_chart.png")
+    plt.close()
+
+# Cost Pressure Distribution Chart
+
+def generate_cost_pressure_chart():
+    import csv
+    import os
+    import matplotlib
+
+    matplotlib.use("Agg")
+
+    import matplotlib.pyplot as plt
+
+    cost_pressure_counts = {}
+
+    # 读取 CSV 里的主要成本压力数据
+    with open("fleet_data.csv", "r", newline="", encoding="utf-8") as file:
+        reader = csv.DictReader(file)
+
+        for row in reader:
+            cost_pressure = row["highest_cost_category"]
+
+            if cost_pressure in cost_pressure_counts:
+                cost_pressure_counts[cost_pressure] += 1
+            else:
+                cost_pressure_counts[cost_pressure] = 1
+
+    # 确保 charts 文件夹存在
+    os.makedirs("static/charts", exist_ok=True)
+
+    # 生成成本压力分布图
+    plt.figure(figsize=(8, 5))
+    bars = plt.bar(cost_pressure_counts.keys(), cost_pressure_counts.values())
+
+    plt.title("Cost Pressure Distribution")
+    plt.xlabel("Main Cost Pressure")
+    plt.ylabel("Number of Trucks")
+
+    # 在柱状图上显示车辆数量
+    for bar in bars:
+        height = bar.get_height()
+        x_position = bar.get_x() + bar.get_width() / 2
+
+        plt.text(
+            x_position,
+            height,
+            f"{int(height)}",
+            ha="center",
+            va="bottom"
+        )
+
+    plt.xticks(rotation=30)
+    plt.tight_layout()
+
+    # 保存图表图片
+    plt.savefig("static/charts/cost_pressure_chart.png")
+    plt.close()
+
 
 def get_ai_response(question):
     # 这个功能不是真正的大模型 AI。

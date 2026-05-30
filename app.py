@@ -15,7 +15,11 @@ from fleetmind_core import (
     read_analysis_history,
     compare_trucks,
     get_ai_response,
-    get_dashboard_data
+    get_dashboard_data,
+    generate_revenue_chart,
+    generate_profit_chart,
+    generate_risk_chart,
+    generate_cost_pressure_chart,
 )
 
 
@@ -202,6 +206,17 @@ def dashboard():
     data = get_dashboard_data()
     # 把dashboard数据传给网页
     return render_template("dashboard.html", data=data)
+
+# 分析图表页面
+@app.route("/analytics")
+def analytics():
+    #生成各个图表
+    generate_revenue_chart()
+    generate_profit_chart()
+    generate_risk_chart()
+    generate_cost_pressure_chart()
+
+    return render_template("analytics.html")
 
 
 # 程序入口

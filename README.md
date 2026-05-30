@@ -1,77 +1,18 @@
-# FleetMind-Web-V3
+# FleetMind Web V4 - Data Visualization Analytics Version
 
 ## 项目简介
 
-FleetMind-Web-V3 是我在 FleetMind-Web-V2 基础上继续升级出来的物流数据分析 Web 项目。
+FleetMind 是一个我自己一步步开发出来的物流车队数据分析 Web App。这个项目最开始只是一个简单的 Truck 单车分析工具，后来慢慢升级成了一个可以保存车辆数据、查看历史记录、生成 Fleet Dashboard，并进一步进行数据可视化分析的小型物流数据系统。
 
-V2 版本已经实现了：
+这个项目的灵感来自我之前接触过的物流和运输业务。我发现真实的物流管理并不只是看一辆车赚了多少钱，还要综合考虑收入、成本、利润率、风险等级、主要成本压力等因素。所以我希望用 Python 和 Flask 做一个简单但有实际意义的工具，把车辆运营数据变得更清楚、更直观。
 
-* 用户新增 Truck 数据
-* 自动计算收入、成本、利润、利润率和风险等级
-* 将新增车辆保存到 `fleet_data.csv`
-* 在 Records 页面查看历史保存记录
-
-但是 V2 主要还是偏向“单条记录保存”和“历史记录查看”。
-
-所以在 V3 中，我想进一步升级成一个更像真实物流管理系统的版本：
-
-> 不只是看一辆车，而是从整个车队角度看运营情况。
-
-因此，V3 的核心目标是新增一个 Fleet Dashboard。
+V4 是在 V3 Dashboard 版本基础上的进一步升级，重点是加入 **Data Visualization 数据可视化功能**。相比 V3 主要展示汇总数字，V4 开始用图表展示车队数据，让数据分析结果更加直观，也更像一个真正的数据分析项目。
 
 ---
 
-## 从 V2 到 V3 的升级目标
+## 从 V3 到 V4：为什么要升级？
 
-V2 的功能重点是：
-
-```text
-Add Truck
-↓
-Analyse Truck
-↓
-Save to CSV
-↓
-View Records
-```
-
-V3 的升级重点是：
-
-```text
-Read CSV
-↓
-Calculate Fleet Statistics
-↓
-Show Dashboard
-```
-
-也就是说，V3 不再只是保存数据，而是开始利用已有数据做统计分析。
-
----
-
-## V3 新增功能
-
-### 1. Fleet Dashboard 页面
-
-V3 新增了一个页面：
-
-```text
-/dashboard
-```
-
-对应文件：
-
-```text
-templates/dashboard.html
-```
-
-这个页面会读取 `fleet_data.csv` 中已经保存的车辆记录，并显示整体运营统计结果。
-
----
-
-### 2. Dashboard 统计指标
-
-目前 Dashboard 显示以下指标：
+在 V3 版本中，我已经完成了 Fleet Dashboard。Dashboard 可以展示：
 
 * Truck Count
 * Total Revenue
@@ -83,383 +24,290 @@ templates/dashboard.html
 * Lowest Margin Truck
 * Most Common Cost Pressure
 
-这些指标让系统从“单车分析工具”开始变成一个“小型车队运营看板”。
+这些内容让项目已经不只是单车分析，而是可以从“车队整体”的角度理解数据。
+
+但是我后来发现，只有数字还不够直观。比如：
+
+* 哪辆车收入最高？
+* 哪辆车利润最低？
+* 有没有亏损车辆？
+* 风险等级分布是否集中？
+* 主要成本压力到底集中在哪一类？
+
+这些问题如果只看表格或文字，需要用户自己慢慢比较。但如果用图表显示，就会一眼清楚。
+
+所以 V4 的目标就是：
+**把 FleetMind 从 Dashboard 数字总结，升级成带有数据可视化能力的 Analytics 工具。**
 
 ---
 
-### 3. 新增 `get_dashboard_data()`
+## V4 新增功能
 
-在 `fleetmind_core.py` 中，我新增了：
-
-```python
-def get_dashboard_data():
-```
-
-这个函数负责：
+V4 新增了一个独立的数据可视化页面：
 
 ```text
-读取 CSV 文件
-↓
-遍历所有车辆记录
-↓
-累加收入、成本、利润和利润率
-↓
-统计高风险车辆数量
-↓
-找出表现最好和利润率最低的车辆
-↓
-统计最常见的成本压力
-↓
-把结果返回给 Flask 页面
+/analytics
 ```
 
-这个函数是 V3 的核心。
-
-它让 Dashboard 页面不只是静态网页，而是可以根据 CSV 数据动态生成统计结果。
-
----
-
-## V3 的开发过程
-
-### 第一步：先写数据逻辑，而不是先写页面
-
-一开始我没有直接写 `dashboard.html`，而是先在 `fleetmind_core.py` 里写：
-
-```python
-get_dashboard_data()
-```
-
-我觉得这是这次升级里比较重要的一点。
-
-因为 Dashboard 本质上不是先有网页，而是先有数据统计逻辑。
-
-所以开发顺序是：
+对应页面文件：
 
 ```text
-fleetmind_core.py
-先处理数据
+templates/analytics.html
+```
 
+新增图表保存目录：
+
+```text
+static/charts/
+```
+
+目前 V4 可以自动生成并显示四张图表：
+
+### 1. Revenue by Truck
+
+每辆车收入柱状图。
+
+这个图可以帮助用户快速比较不同 Truck 的收入表现，判断哪辆车贡献的 revenue 更高。
+
+生成文件：
+
+```text
+static/charts/revenue_chart.png
+```
+
+---
+
+### 2. Profit by Truck
+
+每辆车利润柱状图。
+
+这个图不仅可以显示盈利车辆，也可以显示亏损车辆。比如如果某辆车 profit 是负数，柱子会向下，并且会直接显示负数数值。
+
+这个功能让我觉得很有意义，因为真实业务中，发现亏损车辆比只看高收入车辆更重要。收入高不代表赚钱，利润和成本控制才是核心。
+
+生成文件：
+
+```text
+static/charts/profit_chart.png
+```
+
+---
+
+### 3. Risk Level Distribution
+
+风险等级分布图。
+
+风险等级固定显示四类：
+
+```text
+Excellent
+Normal
+Warning
+High Risk
+```
+
+即使某一类当前车辆数量是 0，也会保留在图表逻辑中。这样做比只显示 CSV 里出现过的风险等级更专业，因为它保证了分析标准的一致性。
+
+生成文件：
+
+```text
+static/charts/risk_chart.png
+```
+
+---
+
+### 4. Cost Pressure Distribution
+
+主要成本压力分布图。
+
+这个图会统计每辆车的主要成本压力来源，例如：
+
+```text
+Fuel Cost
+Repair Cost
+Toll Cost
+Salary Cost
+Insurance Cost
+```
+
+目前测试数据中主要成本压力集中在 Fuel Cost，所以图表里显示 Fuel Cost 数量最高。以后如果加入更多车辆数据，这张图可以帮助分析车队最常见的成本问题。
+
+生成文件：
+
+```text
+static/charts/cost_pressure_chart.png
+```
+
+---
+
+## 技术实现思路
+
+V4 没有大改 V3 的结构，而是在原来的项目基础上做增量升级。
+
+整体流程是：
+
+```text
+读取 fleet_data.csv
 ↓
-
-app.py
-再添加 Flask route
-
+用 Python 处理车辆数据
 ↓
-
-dashboard.html
-最后显示到网页上
+用 matplotlib 生成图表
+↓
+保存成 PNG 图片
+↓
+Flask 在 analytics.html 页面中显示图片
 ```
 
-这样比直接写 HTML 更清楚，也更容易 Debug。
+这样做的好处是结构比较清楚，也比较适合我目前的学习阶段。前端不需要引入复杂的 JavaScript 图表库，后端也不需要马上升级数据库。先用 CSV + matplotlib 把数据可视化跑通，是一个比较稳妥的进阶路线。
 
 ---
 
-### 第二步：在 Flask 中新增 `/dashboard`
+## V4 新增核心函数
 
-在 `app.py` 中，我新增了：
-
-```python
-@app.route("/dashboard")
-def dashboard():
-    data = get_dashboard_data()
-    return render_template("dashboard.html", data=data)
-```
-
-一开始我没有直接连接 HTML，而是先用：
+在 `fleetmind_core.py` 中新增了以下函数：
 
 ```python
-return str(data)
+generate_revenue_chart()
+generate_profit_chart()
+generate_risk_chart()
+generate_cost_pressure_chart()
 ```
 
-测试数据能不能正常显示。
+这些函数分别负责读取 `fleet_data.csv`，提取对应字段，然后生成图表图片。
 
-确认数据正常后，才改成：
+在 `app.py` 中新增了：
 
 ```python
-return render_template("dashboard.html", data=data)
+@app.route("/analytics")
+def analytics():
 ```
 
-这个过程让我意识到：
-
-> 写 Web 项目时，不要一上来就美化页面，应该先确认数据是对的。
+每次访问 `/analytics` 页面时，系统会重新生成最新图表，确保页面显示的是当前 CSV 数据对应的分析结果。
 
 ---
 
-### 第三步：创建 Dashboard 页面
+## 遇到的问题和解决过程
 
-之后我新建了：
+### 问题 1：CSV 字段名不匹配
+
+一开始写 Revenue Chart 的时候，我本来想用 `truck_name` 作为横坐标，但后来检查 `fleet_data.csv` 后发现真实字段是：
 
 ```text
-templates/dashboard.html
+truck_id
 ```
 
-最开始只是简单显示：
-
-```html
-<p>Truck Count: {{ data.truck_count }}</p>
-```
-
-后来再慢慢改成卡片式布局。
-
-现在 Dashboard 使用了卡片结构来显示不同指标，看起来更像一个真实系统的运营面板。
-
----
-
-## V3 中遇到的问题和解决方法
-
-### 1. records 和 record 混淆
-
-在写高风险车辆统计时，我一开始写错了：
-
-```python
-records["risk_level"]
-```
-
-结果报错：
+如果继续使用 `truck_name`，程序会出现：
 
 ```text
-TypeError: list indices must be integers or slices, not str
+KeyError
 ```
 
-后来发现原因是：
+所以后来改成使用：
 
 ```python
-records
+row["truck_id"]
 ```
 
-是整个列表。
+这让我意识到，做数据项目时不能凭感觉写字段名，必须先确认真实数据结构。
 
-而：
+---
+
+### 问题 2：为什么变量名要用复数
+
+在写图表函数时，我使用了：
 
 ```python
-record
+truck_ids = []
+revenues = []
+profits = []
 ```
 
-才是循环里的单条数据。
-
-正确写法应该是：
+这是因为这些变量不是一个值，而是一组数据。比如：
 
 ```python
-for record in records:
-    if record["risk_level"] == "High Risk":
-        high_risk_count += 1
+truck_ids = ["Truck 013", "Truck 014", "Truck 015"]
+revenues = [260000, 240000, 38000]
 ```
 
-这个错误让我更清楚地理解了：
+这让我对 list 数据结构的理解更清楚了：
+单个值用单数，一组值用复数，代码可读性会更好。
+
+---
+
+### 问题 3：matplotlib 导致 Flask 崩溃
+
+V4 开发中遇到的最大问题是 matplotlib 在 Flask 中运行时，Mac 出现了类似下面的报错：
 
 ```text
-records = list
-record = dict
-record["risk_level"] = 当前车辆的风险等级
+NSWindow should only be instantiated on the main thread
 ```
 
-这个点虽然基础，但对理解 CSV 数据读取非常重要。
+这个问题的原因是 matplotlib 默认可能会尝试打开 GUI 图形窗口，但 Flask Web App 运行时不应该弹出图形窗口。
+
+解决方法是在图表函数中加入：
+
+```python
+import matplotlib
+matplotlib.use("Agg")
+```
+
+这样 matplotlib 就不会打开窗口，而是只在后台生成 PNG 图片。
+
+这个问题让我学到一个很重要的点：
+在 Web 项目里使用 matplotlib 时，要注意后端渲染模式，不能让它像本地画图程序一样打开窗口。
 
 ---
 
-### 2. CSV 读取出来的数字都是字符串
+### 问题 4：亏损车辆不够明显
 
-`read_trucks_from_csv()` 读取出来的数据虽然看起来像数字，但其实都是字符串。
+Profit Chart 一开始虽然可以显示负利润，但亏损车辆只是柱子向下，不够直观。
 
-比如：
+后来我在柱状图上加入了数值标签，让亏损车辆可以直接显示负数。例如：
 
-```python
-record["revenue"]
+```text
+-5000
 ```
 
-读出来是：
+这样用户可以更明显地看到哪辆车在亏损。
 
-```python
-"68000"
-```
-
-不是：
-
-```python
-68000
-```
-
-所以在 Dashboard 统计时，必须写：
-
-```python
-float(record["revenue"])
-```
-
-同样地，利润、成本、利润率都要转换成 `float` 后才能计算。
+这个小改动虽然代码不复杂，但我觉得很实用，因为真实的数据分析不只是把图画出来，还要让别人看得懂。
 
 ---
 
-### 3. Dashboard 一开始只显示字典
+### 问题 5：Risk Chart 应该固定四个等级
 
-最开始访问 `/dashboard` 时，页面只是显示：
+一开始 Risk Chart 是根据 CSV 里出现的风险等级自动生成。如果某个等级没有出现，比如 `Warning`，图表就不会显示它。
+
+后来我觉得这样不够规范，所以改成固定四个风险等级：
 
 ```python
-{'truck_count': 2, 'total_revenue': 500000.0}
-```
-
-虽然很丑，但这个步骤很有用，因为它证明后端数据已经算出来了。
-
-后来我才把它接入：
-
-```html
-dashboard.html
-```
-
-这让我学到一个开发习惯：
-
-> 先让功能跑通，再慢慢让它变好看。
-
----
-
-### 4. CSS class 名字影响了其他页面
-
-Dashboard 一开始使用了：
-
-```css
-.card
-```
-
-但是项目里其他页面，比如 Sample Trucks 页面，也用了 `.card`。
-
-结果 Dashboard 的样式影响到了 Sample Trucks 页面，导致原来的页面样式变了。
-
-后来我把 Dashboard 的卡片 class 改成：
-
-```css
-.dashboard-card
-```
-
-这样 Dashboard 的样式就不会影响其他页面。
-
-这个问题让我第一次比较直观地理解了：
-
-> CSS class 命名不能太随意，不然不同页面之间会互相污染。
-
----
-
-### 5. Dashboard 上色一开始不生效
-
-我想给 Dashboard 里的利润和风险数字上色，比如：
-
-* 正利润显示绿色
-* 高风险车辆数量显示红色
-
-但是一开始颜色没有变化。
-
-后来发现是因为我之前写了：
-
-```css
-.dashboard-card p {
-    color: #1f4e79;
+risk_counts = {
+    "Excellent": 0,
+    "Normal": 0,
+    "Warning": 0,
+    "High Risk": 0
 }
 ```
 
-这条规则把所有 Dashboard 卡片里的 `<p>` 都固定成了蓝色。
+这样即使某个等级当前数量是 0，也能保持分析标准完整。
 
-后来我用更具体的 CSS 选择器覆盖：
-
-```css
-.dashboard-card p.profit-positive {
-    color: #1f8f4d;
-}
-
-.dashboard-card p.profit-negative {
-    color: #c0392b;
-}
-```
-
-这样颜色才正常显示。
-
-这次问题让我学到了 CSS 优先级。
-
----
-
-## V3 当前效果
-
-现在 V3 的 Dashboard 可以显示：
-
-```text
-Truck Count
-Total Revenue
-Total Cost
-Total Profit
-Average Profit Margin
-High Risk Trucks
-Best Performing Truck
-Lowest Margin Truck
-Most Common Cost Pressure
-```
-
-其中：
-
-* Total Profit 为正时显示绿色
-* Average Profit Margin 表现好时显示绿色
-* High Risk Trucks 大于 0 时显示红色
-* 普通统计数据保持蓝色
-
-整体视觉比 V2 更清楚，也更像一个运营分析页面。
-
----
-
-## Dashboard 数据来源说明
-
-目前 Dashboard 只统计：
-
-```text
-fleet_data.csv
-```
-
-里面保存的车辆记录。
-
-它不会统计 Sample Trucks 页面里的样本数据。
-
-这样设计是故意的，因为 Sample Trucks 是演示数据，如果混入 Dashboard，会影响真实保存记录的统计结果。
-
-所以当前逻辑是：
-
-```text
-Sample Trucks
-= 用于演示和测试
-
-CSV Records
-= 用户真实保存的数据
-
-Dashboard
-= 基于 CSV Records 的统计分析
-```
-
----
-
-## V2 和 V3 的区别
-
-| 版本 | 主要功能                  | 特点            |
-| -- | --------------------- | ------------- |
-| V2 | CSV Storage + Records | 可以保存和查看车辆记录   |
-| V3 | Fleet Dashboard       | 可以统计和分析整体车队表现 |
-
-简单来说：
-
-```text
-V2 让系统能“记住数据”
-V3 让系统能“分析数据”
-```
-
-这是这次升级最大的变化。
+这让我意识到：
+数据分析不仅要看现有数据，还要设计好分类标准和分析框架。
 
 ---
 
 ## 当前项目结构
 
 ```text
-FleetMind-Web-V3
+FleetMind-Web-V4
 
 app.py
 fleetmind_core.py
 fleet_data.csv
 fleet_history.txt
+README.md
 
 templates/
-│
 ├── index.html
 ├── result.html
 ├── records.html
@@ -468,120 +316,97 @@ templates/
 ├── assistant.html
 ├── history.html
 ├── new_truck.html
-└── dashboard.html
+├── dashboard.html
+└── analytics.html
 
 static/
-│
-└── style.css
-
-README.md
+├── style.css
+└── charts/
+    ├── revenue_chart.png
+    ├── profit_chart.png
+    ├── risk_chart.png
+    └── cost_pressure_chart.png
 ```
 
 ---
 
 ## 当前技术栈
 
-V3 使用到的技术包括：
+本项目目前使用：
 
 * Python
 * Flask
 * HTML
 * CSS
 * CSV
-* Jinja2 Template
+* Jinja2
+* matplotlib
 * Git
 * GitHub
 
-目前还没有使用数据库，数据仍然保存在 CSV 文件中。
-
 ---
 
-## 我对 V3 的理解
+## 我觉得 V4 的进步
 
-FleetMind-Web-V3 对我来说不是一次大重写，而是在 V2 基础上的一次自然升级。
+从 V3 到 V4，我感觉这个项目明显更像一个真正的数据分析项目了。
 
-V2 解决了：
+V3 主要是把数据总结出来，告诉用户整体情况。
+V4 则开始把数据可视化，让用户可以从图表中快速发现问题。
 
-> 数据怎么保存？
+比如：
 
-V3 继续解决：
+* Revenue Chart 可以看收入差异
+* Profit Chart 可以看盈利和亏损
+* Risk Chart 可以看车队风险结构
+* Cost Pressure Chart 可以看主要成本压力集中在哪里
 
-> 保存下来的数据怎么分析？
+这说明 FleetMind 已经不只是一个普通 Flask 小网页，而是一个具备基本数据处理、数据分析和数据可视化能力的小型系统。
 
-这让我感觉这个项目开始从一个简单练习，慢慢变成一个有结构的小型业务系统。
-
-在这次升级中，我学到的最重要的东西不是某一行代码，而是整个开发流程：
+虽然这个项目目前还没有使用数据库、React、Docker 或云部署，但它已经完整体现了一个数据项目的核心流程：
 
 ```text
-先确认数据来源
+数据输入
 ↓
-写核心统计函数
+数据存储
 ↓
-用 Flask route 测试
+数据计算
 ↓
-再连接 HTML 页面
+数据汇总
 ↓
-最后优化 CSS 和用户体验
+数据可视化
+↓
+业务解释
 ```
 
-这个过程让我更像是在做一个真实项目，而不是只完成一道作业题。
+对我来说，这个 V4 版本是一个很重要的进阶点。它让我把 Python、Flask、CSV、matplotlib 和前端页面真正连接到了一起，也让我更理解数据分析项目不是只写代码，而是要让数据服务于真实问题。
 
 ---
 
-## 下一步计划
+## Future Improvements
 
-### V4：Data Visualization
+未来我希望继续把 FleetMind 升级到更完整的版本，比如：
 
-下一版计划加入图表功能，例如：
-
-* Revenue Bar Chart
-* Profit Bar Chart
-* Risk Distribution Chart
-* Cost Pressure Distribution Chart
-
-这样 Dashboard 不只是显示数字，也能通过图表展示趋势和结构。
-
----
-
-### V5：SQLite Database
-
-目前系统使用 CSV 保存数据。
-
-未来希望把 CSV 升级成 SQLite，让数据管理更接近真实系统。
-
-目标包括：
-
-* 查询记录
-* 删除记录
-* 修改记录
-* 按风险等级筛选
-* 按路线筛选
-* 按司机筛选
+* 使用 SQLite 或 PostgreSQL 替代 CSV
+* 加入更多交互式图表
+* 使用 JavaScript Chart.js 或 Plotly
+* 加入车辆筛选功能
+* 加入时间维度分析
+* 加入真实车队运营数据
+* 部署到云端，让别人也可以在线访问
+* 未来甚至可以接入 AI API，生成自动化分析报告
 
 ---
 
 ## 总结
 
-FleetMind-Web-V3 是我从 V2 继续升级出来的版本。
+FleetMind V4 是我从基础 Web App 走向数据可视化项目的一次重要升级。
 
-这次升级的核心是：
+这个版本让我更清楚地理解了：
 
-```text
-从 Records 页面
-升级到 Dashboard 页面
-```
+* 如何读取和处理 CSV 数据
+* 如何用 matplotlib 生成图表
+* 如何把图表接入 Flask 页面
+* 如何通过数据可视化发现业务问题
+* 如何一步步 debug 并解决真实开发问题
 
-也就是从“保存数据”走向“分析数据”。
-
-这个过程中我遇到了不少问题，比如：
-
-* `records` 和 `record` 混淆
-* CSV 数字需要转换成 `float`
-* CSS class 影响其他页面
-* Dashboard 颜色被 CSS 优先级覆盖
-
-但这些问题最后都被一步步解决了。
-
-所以 V3 不只是功能升级，也是我对 Web 项目结构、数据处理和前端样式理解的一次升级。
-
-FleetMind 还会继续迭代。
+这个项目虽然还不是一个大型商业系统，但它已经有了比较完整的数据分析逻辑。对我来说，FleetMind V4 不只是一次代码升级，更是一次从“会写功能”到“会做数据产品”的进步。
