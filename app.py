@@ -3,6 +3,18 @@
 # render_template：用来显示 HTML 页面
 # request：用来接收网页表单提交的数据
 from flask import Flask, render_template, request
+from database import (
+    read_trucks_from_db,
+    get_dashboard_data_from_db,
+    get_analytics_summary_from_db,
+    get_loss_making_trucks_from_db,
+    generate_revenue_chart_from_db,
+    generate_profit_chart_from_db,
+    generate_risk_chart_from_db,
+    generate_cost_pressure_chart_from_db,
+    generate_insights_from_db,
+    save_truck_to_db
+)
 
 # 从我们自己写的 fleetmind_core.py 中导入核心功能
 # 这样 app.py 只负责网页控制，不负责具体计算逻辑
@@ -114,19 +126,18 @@ def new_truck():
 
         # 保存新车分析记录到 fleet_history.txt
         saved = save_analysis_history(truck)
+        
+        # 保存新车结构化数据到 SQLite 数据库
+        db_saved = save_truck_to_db(truck)
 
-        # 保存新车结构化数据到 fleet_data.csv
-        csv_saved = save_truck_to_csv(truck)
-        # 为了debug用的
-        print("CSV saved:", csv_saved)
+        # 为了 debug 用
+        print("Database saved:", db_saved)
 
         # 跳转到 result.html，显示这辆新车的分析结果
-        return render_template(
-            "result.html",
-            truck=truck,
-            saved=saved,
-            csv_saved=csv_saved
-        )
+        return render_template("result.html", 
+                               truck=truck, 
+                               saved=saved, 
+                               db_saved=db_saved)
 
     # 如果用户只是打开 /new-truck 页面，就显示输入表单
     return render_template("new_truck.html")
@@ -190,8 +201,8 @@ def history():
 # csv 车辆记录页面
 @app.route("/records")
 def records():
-    # 从fleet_data.csv读取新增车辆记录
-    records = read_trucks_from_csv()
+    # 从 SQLite 数据库读取新增车辆记录
+    records = read_trucks_from_db()
 
     # 吧records传给records.html显示
     return render_template("records.html", records=records)
@@ -204,28 +215,40 @@ def records():
 # dashboard页面
 @app.route("/dashboard")
 def dashboard():
-    # 读取csv并计算dashboard数据
-    data = get_dashboard_data()
+    # 从 SQLite 数据库读取并计算 dashboard 数据
+    data = get_dashboard_data_from_db()
     # 把dashboard数据传给网页
     return render_template("dashboard.html", data=data)
 
 # 分析图表页面
 @app.route("/analytics")
 def analytics():
-    #生成各个图表
-    generate_revenue_chart()
-    generate_profit_chart()
-    generate_risk_chart()
-    generate_cost_pressure_chart()
-    # 获取analytics页面汇总数据
-    summary = get_analytics_summary()
-    # 获取亏损车辆数据
-    loss_trucks = get_loss_making_trucks()
+    # 从 SQLite 数据库生成四张 analytics 图表
+    generate_revenue_chart_from_db()
+    generate_profit_chart_from_db()
+    generate_risk_chart_from_db()
+    generate_cost_pressure_chart_from_db()
 
-    return render_template("analytics.html", 
-                           summary=summary,
-                           loss_trucks=loss_trucks
-                           )
+    # 从 SQLite 数据库获取 analytics 页面汇总数据
+    summary = get_analytics_summary_from_db()
+
+    # 从 SQLite 数据库获取亏损车辆数据
+    loss_trucks = get_loss_making_trucks_from_db()
+
+    return render_template(
+        "analytics.html",
+        summary=summary,
+        loss_trucks=loss_trucks
+    )
+
+# 运营建议页面
+@app.route("/insights")
+def insights():
+    # 从 SQLite 数据库生成运营建议
+    insights = generate_insights_from_db()
+    # 把建议传给 insight.html 页面
+    return render_template("insights.html", insights=insights)
+
 
 
 # 程序入口

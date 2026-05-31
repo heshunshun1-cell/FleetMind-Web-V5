@@ -378,3 +378,59 @@ pre {
 .loss-item p {
     margin: 6px 0;
 }
+
+/* ===== Insights Page ===== */
+
+.insight-summary-box {
+    background: #f3f7ff;
+    border-left: 5px solid #123c7c;
+    padding: 18px 22px;
+    margin: 25px 0;
+    border-radius: 10px;
+}
+
+.insight-summary-box h2 {
+    margin-top: 0;
+    color: #123c7c;
+    font-size: 22px;
+}
+
+.insight-summary-box p {
+    margin-bottom: 0;
+    line-height: 1.6;
+    color: #333;
+}
+
+.insight-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin-top: 25px;
+}
+
+.insight-card {
+    background: #ffffff;
+    border-left: 6px solid #123c7c;
+    padding: 18px 22px;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.insight-card:hover {
+    transform: translateY(-2px);
+    transition: 0.2s ease;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.10);
+}
+
+.insight-header {
+    font-weight: bold;
+    color: #123c7c;
+    margin-bottom: 8px;
+    font-size: 17px;
+}
+
+.insight-card p {
+    margin: 0;
+    line-height: 1.6;
+    color: #333;
+}
